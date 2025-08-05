@@ -20,11 +20,11 @@ echo "Список пакетов обновлен."
 
 echo "3/14: Загрузка и установка internet-detector..."
 # Загружаем пакет internet-detector
-wget --no-check-certificate -O /tmp/internet-detector_1.6.0-r1_all.ipk https://github.com/gSpotx2f/packages-openwrt/raw/master/current/internet-detector_1.6.0-r1_all.ipk
+wget --no-check-certificate -O /tmp/internet-detector_1.6.1-r1_all.ipk https://github.com/gSpotx2f/packages-openwrt/raw/master/current/internet-detector_1.6.1-r1_all.ipk
 # Устанавливаем internet-detector
-opkg install /tmp/internet-detector_1.6.0-r1_all.ipk
+opkg install /tmp/internet-detector_1.6.1-r1_all.ipk
 # Удаляем временный файл пакета
-rm /tmp/internet-detector_1.6.0-r1_all.ipk
+rm /tmp/internet-detector_1.6.1-r1_all.ipk
 echo "internet-detector установлен."
 
 echo "4/14: Запуск и включение internet-detector..."
@@ -36,11 +36,11 @@ echo "internet-detector запущен и включен."
 
 echo "5/14: Загрузка и установка luci-app-internet-detector..."
 # Загружаем пакет веб-интерфейса для internet-detector
-wget --no-check-certificate -O /tmp/luci-app-internet-detector_1.6.0-r2_all.ipk https://github.com/gSpotx2f/packages-openwrt/raw/master/current/luci-app-internet-detector_1.6.0-r2_all.ipk
+wget --no-check-certificate -O /tmp/luci-app-internet-detector_1.6.1-r1_all.ipk https://github.com/gSpotx2f/packages-openwrt/raw/master/current/luci-app-internet-detector_1.6.1-r1_all.ipk
 # Устанавливаем luci-app-internet-detector
-opkg install /tmp/luci-app-internet-detector_1.6.0-r2_all.ipk
+opkg install /tmp/luci-app-internet-detector_1.6.1-r1_all.ipk
 # Удаляем временный файл пакета
-rm /tmp/luci-app-internet-detector_1.6.0-r2_all.ipk
+rm /tmp/luci-app-internet-detector_1.6.1-r1_all.ipk
 echo "luci-app-internet-detector установлен."
 
 echo "6/14: Перезапуск rpcd..."
@@ -50,11 +50,11 @@ echo "rpcd перезапущен."
 
 echo "7/14: Загрузка и установка языкового пакета для internet-detector (русский)..."
 # Загружаем русский языковой пакет для веб-интерфейса internet-detector
-wget --no-check-certificate -O /tmp/luci-i18n-internet-detector-ru_1.6.0-r2_all.ipk https://github.com/gSpotx2f/packages-openwrt/raw/master/current/luci-i18n-internet-detector-ru_1.6.0-r2_all.ipk
+wget --no-check-certificate -O /tmp/luci-i18n-internet-detector-ru_1.6.1-r1_all.ipk https://github.com/gSpotx2f/packages-openwrt/raw/master/current/luci-i18n-internet-detector-ru_1.6.1-r1_all.ipk
 # Устанавливаем языковой пакет
-opkg install /tmp/luci-i18n-internet-detector-ru_1.6.0-r2_all.ipk
+opkg install /tmp/luci-i18n-internet-detector-ru_1.6.1-r1_all.ipk
 # Удаляем временный файл пакета
-rm /tmp/luci-i18n-internet-detector-ru_1.6.0-r2_all.ipk
+rm /tmp/luci-i18n-internet-detector-ru_1.6.1-r1_all.ipk
 echo "Языковой пакет установлен."
 
 echo "8/14: Загрузка и выполнение скрипта podkop..."
@@ -119,7 +119,7 @@ echo "4. Нажмите 'Изменить' на секции 'Google section' и
 echo "5. Сохраните изменения."
 echo "6. Нажмите 'Изменить' на секции 'Default section' и настройте параметры (как на ваших скриншотах, добавьте нужные вам домены)."
 echo "7. Сохраните изменения."
-echo "8. Внизу страницы нажмите кнопку 'Применить'."
+"8. Внизу страницы нажмите кнопку 'Применить'."
 echo "9. Если какие-то сайты не открываются, проверьте 'Статус службы' в youtubeUnblock и скопируйте блокированные домены в секцию Default."
 
 echo "Установка завершена. Рекомендуется перезагрузить роутер."
