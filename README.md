@@ -102,8 +102,8 @@ opkg print-architecture
 ## 📚 Полезные ссылки
 
 - [OpenWRT Official](https://openwrt.org/)
-- [Internet Detector]((https://github.com/gSpotx2f/luci-app-internet-detector))
-- [Podkop]([https://github.com/gSpotx2f/packages-openwrt](https://github.com/itdoginfo/podkop))
+- [Internet Detector](https://github.com/gSpotx2f/luci-app-internet-detector/)
+- [Podkop](https://github.com/itdoginfo/podkop/)
 
 ## 📄 Лицензия
 
