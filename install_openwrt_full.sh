@@ -15,10 +15,18 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}Начинаем установку пакетов и скриптов...${NC}"
 
 echo -e "${YELLOW}1/8: Отключение IPv6...${NC}"
-# Скачиваем и выполняем скрипт для полного отключения IPv6
-# Добавляем || true, чтобы скрипт не прерывался, если disable-ipv6-full.sh выдаст "Command failed: Not found"
-sh <(wget -O - https://github.com/Davoyan/router-xray-fakeip-installation/raw/main/disable-ipv6-full.sh 2>/dev/null) || true
-echo -e "${GREEN}IPv6 отключен.${NC}"
+# Скачиваем и выполняем улучшенный скрипт для полного отключения IPv6
+# Используем локальный скрипт с более эффективными командами
+if [ -f "./disable-ipv6-full.sh" ]; then
+    sh ./disable-ipv6-full.sh
+else
+    # Если локальный скрипт не найден, загружаем с репозитория
+    wget -O /tmp/disable-ipv6-full.sh https://raw.githubusercontent.com/Davoyan/router-xray-fakeip-installation/main/disable-ipv6-full.sh >/dev/null 2>&1
+    chmod +x /tmp/disable-ipv6-full.sh
+    sh /tmp/disable-ipv6-full.sh
+    rm -f /tmp/disable-ipv6-full.sh
+fi
+echo -e "${GREEN}IPv6 отключен с использованием улучшенного скрипта.${NC}"
 
 echo -e "${YELLOW}2/8: Обновление списка пакетов...${NC}"
 # Обновляем список доступных пакетов, подавляя обычный вывод
