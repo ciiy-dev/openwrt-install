@@ -133,10 +133,12 @@ disable_ipv6() {
 # Функция обновления пакетов
 update_packages() {
     log_progress "2/8: Обновление списка пакетов..."
-    if opkg update >/dev/null 2>&1; then
+    
+    if output=$(opkg update 2>&1); then
         log_info "Список пакетов обновлен"
     else
         log_error "Не удалось обновить список пакетов"
+        echo "$output"  # выведем ошибку на экран
     fi
 }
 
