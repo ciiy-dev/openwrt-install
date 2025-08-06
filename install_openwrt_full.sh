@@ -69,18 +69,54 @@ echo -e "${YELLOW}8/8: Загрузка и выполнение скрипта p
 echo y | sh <(wget -O - https://raw.githubusercontent.com/itdoginfo/podkop/refs/heads/main/install.sh 2>/dev/null)
 echo -e "${GREEN}Скрипт podkop выполнен.${NC}"
 
-echo -e "${YELLOW}--- Дополнительная настройка DoH (DNS over HTTPS) ---${NC}"
-echo "Для настройки DNS over HTTPS выполните следующие шаги:"
-echo "1. Зайдите в веб-интерфейс роутера → System → Software → Update list"
-echo "2. В фильтре найдите и установите пакеты:"
-echo "   - https-dns-proxy"
-echo "   - luci-app-https-dns-proxy"
-echo "   - luci-i18n-https-dns-proxy-ru (для русского интерфейса)"
-echo "3. Перейдите в Службы → HTTPS DNS Прокси"
-echo "4. Удалите стандартные конфигурации Google и Cloudflare"
-echo "5. Нажмите 'Добавить', выберите провайдер: Comss DNS (RU)"
-echo "6. Bootstrap DNS: 1.1.1.1,8.8.8.8"
-echo "7. Сохраните и примените настройки"
+echo -e "${YELLOW}--- Настройка YouTube Unblock ---${NC}"
+echo -e "${YELLOW}9/14: Установка зависимостей для YouTube Unblock...${NC}"
+# Устанавливаем необходимые зависимости для YouTube Unblock
+opkg update >/dev/null 2>&1 # Обновляем на всякий случай
+opkg install kmod-nfnetlink-queue kmod-nft-queue kmod-nf-conntrack curl >/dev/null 2>&1
+echo -e "${GREEN}Зависимости YouTube Unblock установлены.${NC}"
+
+echo -e "${YELLOW}10/14: Загрузка и установка YouTube Unblock (основной пакет)...${NC}"
+# Загружаем основной пакет YouTube Unblock для архитектуры aarch64_cortex-a53
+wget --no-check-certificate -O /tmp/youtubeUnblock-aarch64_cortex-a53.ipk https://github.com/Waujito/youtubeUnblock/releases/download/v1.0.0/youtubeUnblock-1.0.0-10-f37c3dd-aarch64_cortex-a53-openwrt-23.05.ipk >/dev/null 2>&1
+# Устанавливаем основной пакет
+opkg install /tmp/youtubeUnblock-aarch64_cortex-a53.ipk >/dev/null 2>&1
+# Удаляем временный файл
+rm /tmp/youtubeUnblock-aarch64_cortex-a53.ipk
+echo -e "${GREEN}Основной пакет YouTube Unblock установлен.${NC}"
+
+echo -e "${YELLOW}11/14: Загрузка и установка YouTube Unblock (LuCI-интерфейс)...${NC}"
+# Загружаем пакет LuCI-интерфейса для YouTube Unblock
+wget --no-check-certificate -O /tmp/luci-app-youtubeUnblock.ipk https://github.com/Waujito/youtubeUnblock/releases/download/v1.0.0/luci-app-youtubeUnblock-1.0.0-10-f37c3dd.ipk >/dev/null 2>&1
+# Устанавливаем пакет LuCI-интерфейса
+opkg install /tmp/luci-app-youtubeUnblock.ipk >/dev/null 2>&1
+# Удаляем временный файл
+rm /tmp/luci-app-youtubeUnblock.ipk
+echo -e "${GREEN}LuCI-интерфейс YouTube Unblock установлен.${NC}"
+
+echo -e "${YELLOW}12/14: Добавление правил Firewall для YouTube Unblock...${NC}"
+# Добавляем правила в firewall для работы приложения
+# Ошибки "No such file or directory" при добавлении правил nftables могут быть связаны с тем,
+# что youtubeUnblock пытается добавить их до того, как необходимые модули ядра
+# kmod-nfnetlink-queue и kmod-nft-queue полностью загружены или настроены.
+# Мы перенесли установку этих зависимостей выше, чтобы минимизировать эту проблему.
+nft add chain inet fw4 youtubeUnblock '{ type filter hook postrouting priority mangle - 1; policy accept; }'
+nft add rule inet fw4 youtubeUnblock 'tcp dport 443 ct original packets < 20 counter queue num 537 bypass'
+nft add rule inet fw4 youtubeUnblock 'meta l4proto udp ct original packets < 9 counter queue num 537 bypass'
+nft insert rule inet fw4 output 'mark and 0x8000 == 0x8000 counter accept'
+echo -e "${GREEN}Правила Firewall добавлены.${NC}"
+
+echo -e "${YELLOW}13/14: Изменение файла ruleset.uc для YouTube Unblock...${NC}"
+# Изменяем строку в файле ruleset.uc для корректной работы
+# Ищем строку 'meta l4proto { tcp, udp } flow offload @ft;'
+# И заменяем ее на 'meta l4proto { tcp, udp } ct original packets ge 30 flow offload @ft;'
+sed -i 's/meta l4proto { tcp, udp } flow offload @ft;/meta l4proto { tcp, udp } ct original packets ge 30 flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc
+echo -e "${GREEN}Файл ruleset.uc изменен.${NC}"
+
+echo -e "${YELLOW}14/14: Перезапуск Firewall...${NC}"
+# Перезапускаем firewall для применения новых правил
+fw4 restart >/dev/null 2>&1
+echo -e "${GREEN}Firewall перезапущен.${NC}"
 
 echo -e "${GREEN}Установка завершена. Рекомендуется перезагрузить роутер.${NC}"
 echo -e "Вы можете сделать это командой '${YELLOW}reboot${NC}'."
