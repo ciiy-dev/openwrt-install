@@ -134,13 +134,57 @@ disable_ipv6() {
 update_packages() {
     log_progress "2/8: Обновление списка пакетов..."
     
-    output=$(opkg update 2>&1)
+    # Ожидаем восстановления сети после перезапуска сетевой службы
+    log_info "Ожидание восстановления сетевого подключения..."
+    sleep 5
     
-    if echo "$output" | grep -q "Updated list"; then
-        log_info "Список пакетов обновлен"
-    else
-        log_error "Не удалось обновить список пакетов"
+    # Проверяем доступность интернета перед обновлением
+    local retries=3
+    local retry_count=0
+    
+    while [ $retry_count -lt $retries ]; do
+        if ping -c 1 -W 5 openwrt.org >/dev/null 2>&1; then
+            log_info "Сетевое подключение восстановлено"
+            break
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $retries ]; then
+                log_info "Попытка $retry_count/$retries: Ожидание восстановления сети..."
+                sleep 3
+            else
+                log_warning "Не удалось дождаться восстановления сети, продолжаем..."
+            fi
+        fi
+    done
+    
+    # Попытка обновления пакетов
+    retry_count=0
+    local success=0
+    
+    while [ $retry_count -lt $retries ] && [ $success -eq 0 ]; do
+        retry_count=$((retry_count + 1))
+        log_info "Попытка обновления пакетов $retry_count/$retries..."
+        
+        output=$(opkg update 2>&1)
+        exit_code=$?
+        
+        if [ $exit_code -eq 0 ] || echo "$output" | grep -q -E "(Updated list|Signature check passed)"; then
+            log_info "Список пакетов успешно обновлен"
+            success=1
+        else
+            log_warning "Попытка $retry_count не удалась"
+            if [ $retry_count -lt $retries ]; then
+                log_info "Ожидание перед следующей попыткой..."
+                sleep 5
+            fi
+        fi
+    done
+    
+    if [ $success -eq 0 ]; then
+        log_warning "Не удалось обновить список пакетов после $retries попыток"
+        log_warning "Вывод последней попытки:"
         echo "$output"
+        log_warning "Продолжаем установку, но некоторые пакеты могут быть недоступны"
     fi
 }
 
