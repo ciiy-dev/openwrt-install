@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Конфигурация пакетов
-INTERNET_DETECTOR_VERSION="1.6.1-r1"
+INTERNET_DETECTOR_VERSION="1.6.2-r1"
 YOUTUBE_UNBLOCK_VERSION="1.0.0"
 TEMP_DIR="/tmp/openwrt_install"
 
